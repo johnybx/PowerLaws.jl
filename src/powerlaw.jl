@@ -19,23 +19,20 @@ end
 
 
 using Distributions
-import powerlaw:bootstrap,bootstrap_p
+import powerlaw:bootstrap,bootstrap_p,con_powerlaw,dis_powerlaw
 
 #this parallel versions of bootstrap,bootstrap_p cannot be defined in module powerlaw at this time because
 #of this issue #https://github.com/JuliaLang/julia/issues/13649
 
 function bootstrap(data::AbstractArray,d::UnivariateDistribution, processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
   (α,θ) = params(d)
-  discrete = false
 
   n = length(data)
-  if (typeof(d) == dis_powerlaw)
-    discrete = true
-  end
+
   seed == 0 ? srand() : srand(seed)
   prcs = addprocs(processes)
   rmref = RemoteRef(1)
-  put!(rmref,(d,discrete,n,xmins,xmax,data))
+  put!(rmref,(d,n,xmins,xmax,data))
   helper_arr = Array(Int8,no_of_sims)
   fill!(helper_arr,0)
   @everywhere using powerlaw
@@ -43,8 +40,8 @@ function bootstrap(data::AbstractArray,d::UnivariateDistribution, processes::Int
   helper_dict = Dict{Int64,RemoteRef}()
   for prc in workers() # copy data to all processes
     helper_dict[prc] = @spawnat prc begin
-      global d,discrete,n,xmins,xmax,data
-      d,discrete,n,xmins,xmax,data = fetch(rmref)
+      global d,n,xmins,xmax,data
+      d,n,xmins,xmax,data = fetch(rmref)
     end
   end
   for prc in workers() # wait till all data is coppied
@@ -52,18 +49,20 @@ function bootstrap(data::AbstractArray,d::UnivariateDistribution, processes::Int
   end
   helper_dict = 0
   @everywhere function helper_func(args)
-    #rmref = args
-    #d,discrete,n,xmins,xmax,data = fetch(rmref)
     sim_data = sample(data, n, replace=true)
-    estimate_xmin(sim_data,discrete,xmins = xmins,xmax = xmax)
+    estimate_xmin(sim_data,typeof(d),xmins = xmins,xmax = xmax)
   end
   statistic = pmap(helper_func,helper_arr)
   rmprocs(prcs)
   take!(rmref)
   return statistic
 end
-function bootstrap(data::AbstractArray,discrete::Bool,processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
-  d,ks = estimate_xmin(data,discrete,xmins = xmins,xmax =xmax)
+function bootstrap(data::AbstractArray,distribution::Type{con_powerlaw},processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+  d,ks = estimate_xmin(data,distribution,xmins = xmins,xmax =xmax)
+  bootstrap(data,d,processes,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
+end
+function bootstrap(data::AbstractArray,distribution::Type{dis_powerlaw},processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+  d,ks = estimate_xmin(data,distribution,xmins = xmins,xmax =xmax)
   bootstrap(data,d,processes,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
 end
 function bootstrap_p(data::AbstractArray,d::UnivariateDistribution, processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
@@ -73,14 +72,11 @@ function bootstrap_p(data::AbstractArray,d::UnivariateDistribution, processes::I
   tail_indx = findfirst(sort_data,θ)
   tail_p = length(sort_data[tail_indx:end])/n
   KS_stat = Kolmogorov_smirnov_test(sort_data[tail_indx:end],d)
-  discrete = false
-  if (typeof(d) == dis_powerlaw)
-    discrete = true
-  end
+
   seed == 0 ? srand() : srand(seed)
   prcs = addprocs(processes)
   rmref = RemoteRef(1)
-  put!(rmref,(d,discrete,n,tail_p,tail_indx,xmins,xmax,sort_data))
+  put!(rmref,(d,n,tail_p,tail_indx,xmins,xmax,sort_data))
   helper_arr = Array(Int8,no_of_sims)
   fill!(helper_arr,0)
   @everywhere using powerlaw
@@ -89,8 +85,8 @@ function bootstrap_p(data::AbstractArray,d::UnivariateDistribution, processes::I
   helper_dict = Dict{Int64,RemoteRef}()
   for prc in workers() # copy data to all processes
     helper_dict[prc] = @spawnat prc begin
-      global d,discrete,n,tail_p,tail_indx,xmins,xmax,sort_data
-      d,discrete,n,tail_p,tail_indx,xmins,xmax,sort_data = fetch(rmref)
+      global d,n,tail_p,tail_indx,xmins,xmax,sort_data
+      d,n,tail_p,tail_indx,xmins,xmax,sort_data = fetch(rmref)
     end
   end
   for prc in workers() # wait till all data is coppied
@@ -99,14 +95,12 @@ function bootstrap_p(data::AbstractArray,d::UnivariateDistribution, processes::I
   helper_dict = 0
 
   @everywhere helper_func(args) = begin
-    #rmref = args
-    #d,discrete,n,tail_p,tail_indx,xmins,xmax,sort_data = fetch(rmref)
     n1 = sum(map(x-> x>tail_p,rand(n)))
     n2 = n - n1
     sim_data = Array(Float64,0)
     append!(sim_data,sample(sort_data[1:tail_indx-1],n1,replace = true))
     append!(sim_data,rand(d,n2))
-    estimate_xmin(sim_data,discrete,xmins = xmins,xmax = xmax)
+    estimate_xmin(sim_data,typeof(d),xmins = xmins,xmax = xmax)
   end
 
   statistic= pmap(helper_func,helper_arr)
@@ -122,7 +116,11 @@ function bootstrap_p(data::AbstractArray,d::UnivariateDistribution, processes::I
 
   return statistic,(P/no_of_sims)
 end
-function bootstrap_p(data::AbstractArray,discrete::Bool,processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
-  d,ks = estimate_xmin(data,discrete,xmins = xmins,xmax =xmax)
+function bootstrap_p(data::AbstractArray,distribution::Type{con_powerlaw},processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+  d,ks = estimate_xmin(data,distribution,xmins = xmins,xmax =xmax)
+  bootstrap_p(data,d,processes,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
+end
+function bootstrap_p(data::AbstractArray,distribution::Type{dis_powerlaw},processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+  d,ks = estimate_xmin(data,distribution,xmins = xmins,xmax =xmax)
   bootstrap_p(data,d,processes,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
 end
