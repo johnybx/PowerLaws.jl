@@ -1,0 +1,51 @@
+function bootstrap(data::AbstractArray,d::UnivariateDistribution;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+  (α,θ) = params(d)
+  discrete = false
+
+  n = length(data)
+  if (typeof(d) == dis_powerlaw)
+    discrete = true
+  end
+  seed == 0 ? srand() : srand(seed)
+  statistic = Array((typeof(d),Float64),no_of_sims)
+  for i=1:no_of_sims
+    sim_data = sample(data, n, replace=true)
+    statistic[i] =estimate_xmin(sim_data,discrete,xmins = xmins,xmax = xmax)
+  end
+  return statistic
+end
+function bootstrap(data::AbstractArray,discrete::Bool;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+  d,ks = estimate_xmin(data,discrete,xmins = xmins,xmax =xmax)
+  bootstrap(data,d,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
+end
+function bootstrap_p(data::AbstractArray,d::UnivariateDistribution;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+  sort_data = sort(data)
+  (α,θ) = params(d)
+  n = length(sort_data)
+  tail_indx = findfirst(sort_data,θ)
+  tail_p = length(sort_data[tail_indx:end])/n
+  KS_stat = Kolmogorov_smirnov_test(sort_data[tail_indx:end],d)
+  discrete = false
+  if (typeof(d) == dis_powerlaw)
+    discrete = true
+  end
+  P = 0
+  statistic = Array((typeof(d),Float64),no_of_sims)
+  seed == 0 ? srand() : srand(seed)
+  for i=1:no_of_sims
+    n1 = sum(map(x-> x>tail_p,rand(n)))
+    n2 = n - n1
+    sim_data = Array(Float64,0)
+    append!(sim_data,sample(sort_data[1:tail_indx-1],n1,replace = true))
+    append!(sim_data,rand(d,n2))
+    statistic[i] = estimate_xmin(sim_data,discrete,xmins = xmins,xmax = xmax)
+    if (KS_stat <= statistic[i][2])
+      P +=1
+    end
+  end
+  return statistic,(P/no_of_sims)
+end
+function bootstrap_p(data::AbstractArray,discrete::Bool;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+  d,ks = estimate_xmin(data,discrete,xmins = xmins,xmax =xmax)
+  bootstrap_p(data,d,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
+end
