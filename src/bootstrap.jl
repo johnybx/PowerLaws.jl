@@ -11,10 +11,12 @@ function bootstrap(data::AbstractArray,d::UnivariateDistribution;no_of_sims::Int
   end
   return statistic
 end
+
 function bootstrap(data::AbstractArray,distribution::Type{con_powerlaw};no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
   d,ks = estimate_xmin(data,distribution,xmins = xmins,xmax =xmax)
   bootstrap(data,d,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
 end
+
 function bootstrap(data::AbstractArray,distribution::Type{dis_powerlaw};no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
   d,ks = estimate_xmin(data,distribution,xmins = xmins,xmax =xmax)
   bootstrap(data,d,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
@@ -44,10 +46,12 @@ function bootstrap_p(data::AbstractArray,d::UnivariateDistribution;no_of_sims::I
   end
   return statistic,(P/no_of_sims)
 end
+
 function bootstrap_p(data::AbstractArray,distribution::Type{con_powerlaw};no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
   d,ks = estimate_xmin(data,distribution,xmins = xmins,xmax =xmax)
   bootstrap_p(data,d,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
 end
+
 function bootstrap_p(data::AbstractArray,distribution::Type{dis_powerlaw};no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
   d,ks = estimate_xmin(data,distribution,xmins = xmins,xmax =xmax)
   bootstrap_p(data,d,no_of_sims = no_of_sims,xmins = xmins,xmax = xmax,seed =seed)
