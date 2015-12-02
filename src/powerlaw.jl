@@ -25,7 +25,7 @@ import powerlaw:bootstrap,bootstrap_p,con_powerlaw,dis_powerlaw
 #of this issue #https://github.com/JuliaLang/julia/issues/13649
 
 function bootstrap(data::AbstractArray,d::UnivariateDistribution, processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
-  (α,θ) = params(d)
+  α,θ = params(d)
 
   n = length(data)
 
@@ -70,7 +70,7 @@ end
 
 function bootstrap_p(data::AbstractArray,d::UnivariateDistribution, processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
   sort_data = sort(data)
-  (α,θ) = params(d)
+  α,θ = params(d)
   n = length(sort_data)
   tail_indx = findfirst(sort_data,θ)
   tail_p = length(sort_data[tail_indx:end])/n
