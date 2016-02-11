@@ -34,13 +34,13 @@ end
 
 function estimate_xmin(data::AbstractArray,distribution::Type{con_powerlaw};xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5))
   min_dist = Inf
-  best_fit = None #Union{} for v0.4
+  best_fit = Union{}
 
   sorted_data,bins_data,xmins = init_xmins(data,xmins,xmax)
 
   if (length(xmins) == 0)
     println("No xmins")
-    return None #Union{}
+    return Union{}
   end
 
   for xmin in xmins
@@ -58,13 +58,13 @@ end
 
 function estimate_xmin(data::AbstractArray,distribution::Type{dis_powerlaw};xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5))
   min_dist = Inf
-  best_fit = None #Union{} for v0.4
+  best_fit = Union{}
 
   sorted_data,bins_data,xmins = init_xmins(data,xmins,xmax)
 
   if (length(xmins) == 0)
     println("No xmins")
-    return None #Union{}
+    return Union{}
   end
 
   for xmin in xmins

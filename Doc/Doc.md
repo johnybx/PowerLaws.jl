@@ -69,14 +69,14 @@ To quantify the uncertainty in our estimate for xmin you can use bootstrap metho
 
 return array of simulated power law distributions with Kolmogorov smirnov test
 
-#### function bootstrap(data::AbstractArray,distribution::Type{};no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
-Almost same as function above only difference is that instead of distribution parameter there is discreate parameter which indicates whether data are discrete or continuous (true for discrete and false for continuous). This function calls estimate_xmin on data with parameter distrete and than perform bootstrap.
+#### bootstrap(data::AbstractArray,distribution::Type{};no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+Almost same as function above only difference is distribution parameter where should by type of distibution (con_powerlaw / dis_powerlaw). This function calls estimate_xmin on data with parameter distrete and than perform bootstrap.
 
 #### bootstrap(data::AbstractArray,d::UnivariateDistribution, processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
 This is parallel version of bootstrap with additional parameter processes. This is number of processes which should be spawned to calculate the bootstrap. Note that this function is using [pmap](http://docs.julialang.org/en/latest/manual/parallel-computing/) which means that if there are existing workers spawned they will be used. When using this function one should consider time which is needed for data to be copied to all processes which means that it make sense to use this function only if estimate_xmin takes long time(more than few second).
 
-#### function bootstrap(data::AbstractArray,distribution::Type{},processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)  
-Almost same as function above only difference is that instead of distribution parameter there is discreate parameter which indicates whether data are discrete or continuous (true for discrete and false for continuous). This function calls estimate_xmin on data with parameter distrete and than perform bootstrap.
+#### bootstrap(data::AbstractArray,distribution::Type{},processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)  
+Almost same as function above only difference is distribution parameter where should by type of distibution (con_powerlaw / dis_powerlaw). This function calls estimate_xmin on data with parameter distrete and than perform bootstrap.
 
 **Examples**
 
@@ -108,14 +108,14 @@ Performs a bootstrapping hypothesis test to determine whether a power law distri
 
 return array of simulated power law distributions with Kolmogorov smirnov test and p_value
 
-#### function bootstrap_p(data::AbstractArray,distribution::Type{};no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
-Almost same as function above only difference is that instead of distribution parameter there is discreate parameter which indicates whether data are discrete or continuous (true for discrete and false for continuous). This function calls estimate_xmin on data with parameter distrete and than perform bootstrap_p.
+#### bootstrap_p(data::AbstractArray,distribution::Type{};no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
+Almost same as function above only difference is distribution parameter where should by type of distibution (con_powerlaw / dis_powerlaw). This function calls estimate_xmin on data with parameter distrete and than perform bootstrap_p.
 
 #### bootstrap_p(data::AbstractArray,d::UnivariateDistribution, processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
 This is parallel version of bootstrap_p with additional parameter processes. This is number of processes which should be spawned to calculate the bootstrap. Note that this function is using [pmap](http://docs.julialang.org/en/latest/manual/parallel-computing/) which means that if there are existing workers spawned they will be used. When using this function one should consider time which is needed for data to be copied to all processes which means that it make sense to use this function only if estimate_xmin takes long time(more than few second).
 
 #### function bootstrap_p(data::AbstractArray,distribution::Type{},processes::Int64;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)  
-Almost same as function above only difference is that instead of distribution parameter there is discreate parameter which indicates whether data are discrete or continuous (true for discrete and false for continuous). This function calls estimate_xmin on data with parameter distrete and than perform bootstrap_p.
+Almost same as function above only difference is distribution parameter where should by type of distibution (con_powerlaw / dis_powerlaw). This function calls estimate_xmin on data with parameter distrete and than perform bootstrap_p.
 
 **Examples**
 
