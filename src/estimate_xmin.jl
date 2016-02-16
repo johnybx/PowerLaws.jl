@@ -4,14 +4,10 @@ function init_xmins(data::AbstractArray,xmins::AbstractArray,xmax::Int64)
   if (xmins == [])
     xmins = sort(unique(sorted_data))
     if (xmins[end] > xmax)
-      for i=1:length(xmins)
-        if (xmins[end-i] <= xmax)
-          xmins = xmins[1:end-i]
-          break
-        end
-      end
+      max_indx = findlast(x -> x <= xmax, xmins)
+      xmins = xmins[1:max_indx]
     end
-    xmins = xmins[1:end-2]
+    xmins = xmins[1:end]
     if xmins[1] < 1
       println("removing elements smaller than 1")
       while xmins[1] < 1
@@ -46,6 +42,23 @@ function estimate_xmin(data::AbstractArray,distribution::Type{con_powerlaw};xmin
   for xmin in xmins
     fit_data = sorted_data[bins_data[xmin]:end]
     f = fit(con_powerlaw,fit_data)
+    #=negloglike(alpha) = begin
+      d = con_powerlaw(alpha[1],f.θ)
+      r = -sum(logpdf(d,fit_data))
+      if(Inf == r || -Inf == r)
+        r = 1e12
+      end
+      return r
+    end
+    try
+      opt_alfa = fminbox(DifferentiableFunction(negloglike),[f.α],[1.0],[Inf])
+      f = con_powerlaw(opt_alfa.minimum[1],f.θ)
+    catch
+      #if fminbox throws error it means that function cannot be optimized
+    end=#
+    if (f.α == Inf)
+      continue
+    end
     d = Kolmogorov_smirnov_test(fit_data,f,xmax)
 
     if ((min_dist > d))
@@ -59,6 +72,10 @@ end
 function estimate_xmin(data::AbstractArray,distribution::Type{dis_powerlaw};xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5))
   min_dist = Inf
   best_fit = Union{}
+  if (data != floor(data))
+    println("Data should be discreate. Use round or floor function.")
+    return Union{}
+  end
 
   sorted_data,bins_data,xmins = init_xmins(data,xmins,xmax)
 
@@ -85,7 +102,9 @@ function estimate_xmin(data::AbstractArray,distribution::Type{dis_powerlaw};xmin
     catch
       #if fminbox throws error it means that function cannot be optimized
     end
-
+    if (f.α == Inf)
+      continue
+    end
     d = Kolmogorov_smirnov_test(fit_data,f,xmax)
 
     if ((min_dist > d))

@@ -2,19 +2,11 @@ function Kolmogorov_smirnov_test(dat::AbstractArray,d::con_powerlaw,xmax::Int64 
   alpha, xmin = params(d)
   data = sort(dat)
   n = float(length(data))
-  if (data[end] > xmax)
-    for i=1:length(data)
-      if (data[end - i]<=xmax)
-        data = data[1:end - i]
-        break
-      end
-    end
-  end
-  if (length(data) < 2)
-    println("Data must be at least of lenght 2!")
-    return Inf
-  end
-  act_cdf = [0:length(data)-1] / n
+  max_indx = findlast(x -> x <= xmax, data)
+  min_indx = findfirst(x -> x >= xmin, data)
+  data = data[min_indx:max_indx]
+  
+  act_cdf = collect(0:length(data)-1) / n
   thr_cdf = cdf(d,float(data))
   D = maximum(abs(act_cdf-thr_cdf))
   return D
@@ -22,42 +14,16 @@ end
 
 function Kolmogorov_smirnov_test(dat::AbstractArray,d::dis_powerlaw,xmax::Int64 = round(Int,1e5))
   alpha, xmin = params(d)
-  data = sort(dat)
+  data = round(Int,sort(dat))
   n = float(length(data))
-  if (data[end] > xmax)
-    for i=1:length(data)
-      if (data[end - i]<=xmax)
-        data = data[1:end - i]
-        break
-      end
-    end
-  end
-  if (length(data) < 2)
-    println("Data must be at least of lenght 2!")
-    return Inf
-  end
-
-  unique_data = sort(unique(data))
-  element = data[1]
-  indx = 0
-  arr = Array(Float64,0)
-  for i=1:length(data)
-    if element == data[i]
-      push!(arr,indx)
-    else
-      indx=i-1
-      element = data[i]
-      push!(arr,indx)
-    end
-  end
-  arr = sort(unique(arr))
-  act_cdf = arr/n
-  if (1-zeta(alpha,xmin) == 1)
-    thr_cdf = ones(Float64,length(unique_data))
-  else
-    thr_cdf = cdf(d,unique_data)
-  end
-
+  max_indx = findlast(x -> x <= xmax, data)
+  min_indx = findfirst(x -> x >= xmin, data)
+  data = data[min_indx:max_indx]
+  
+  thr_cdf = cdf(d,collect(xmin:data[end])+1)
+  occurence = counts(data)[Int(xmin) - (data[1] - 1):end]
+  act_cdf = occurence/sum(occurence)
+  act_cdf = cumsum(act_cdf)
   D = maximum(abs(act_cdf-thr_cdf))
   return D
 end

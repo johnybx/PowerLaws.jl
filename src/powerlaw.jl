@@ -1,4 +1,5 @@
 module powerlaw
+  using StatsBase
   using Distributions
   using Optim
   using Compat
