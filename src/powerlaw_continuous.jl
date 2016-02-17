@@ -46,10 +46,29 @@ function pdf(d::con_powerlaw, x::Float64)
     x >= θ ? ((α-1.0)/θ) * ((x/θ)^(-α)) : 0.0
 end
 
+function pdf(d::con_powerlaw, x::AbstractArray)
+    (α, θ) = params(d)
+    cons = ((α-1.0)/θ)
+    pdfs = Array(Float64,0)
+    for num in x
+        push!(pdfs,(num >= θ ? cons * ((x/θ)^(-α)) : 0.0))
+    end
+    return pdfs
+end
 
 function logpdf(d::con_powerlaw, x::Float64)
     (α, θ) = params(d)
     x >= θ ? log(α-1.0) - log(θ) - α * log(x/θ) : -Inf
+end
+
+function logpdf(d::con_powerlaw, x::AbstractArray)
+    (α, θ) = params(d)
+    l_const = log(α-1.0) - log(θ)
+    lpdfs = Array(Float64,0)
+    for num in x
+        push!(lpdfs,(num >= θ ? l_const - α * log(x/θ) : -Inf))
+    end
+    return lpdfs
 end
 
 

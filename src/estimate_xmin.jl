@@ -8,11 +8,9 @@ function init_xmins(data::AbstractArray,xmins::AbstractArray,xmax::Int64)
       xmins = xmins[1:max_indx]
     end
     xmins = xmins[1:end]
-    if xmins[1] < 1
-      println("removing elements smaller than 1")
-      while xmins[1] < 1
-        shift!(xmins)
-      end
+    if xmins[1] <= 0
+      println("removing elements smaller than 0")
+      xmins = xmins[findfirst(x -> x > 0), end]
     end
   else
     real_xmins = Array(Bool,length(xmins))
@@ -78,6 +76,9 @@ function estimate_xmin(data::AbstractArray,distribution::Type{dis_powerlaw};xmin
   end
 
   sorted_data,bins_data,xmins = init_xmins(data,xmins,xmax)
+  if xmins[1] < 1
+    xmins = xmins[findfirst(x -> x >= 1), end]
+  end
 
   if (length(xmins) == 0)
     println("No xmins")
@@ -87,7 +88,7 @@ function estimate_xmin(data::AbstractArray,distribution::Type{dis_powerlaw};xmin
   for xmin in xmins
     fit_data = sorted_data[bins_data[xmin]:end]
     f = fit(dis_powerlaw,fit_data)
-
+    
     negloglike(alpha) = begin
       d = dis_powerlaw(alpha[1],f.θ)
       r = -sum(logpdf(d,fit_data))
