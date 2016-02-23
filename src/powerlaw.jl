@@ -3,7 +3,7 @@ module powerlaw
   using Distributions
   using Optim
   using Compat
-  import Distributions:rand,shape,pdf,ccdf,scale,params,cdf,cquantile,quantile,fit_mle,mean,median,var,skewness,mode,kurtosis,logccdf,logpdf,logcdf,entropy
+  import Distributions:rand,shape,pdf,ccdf,scale,params,cdf,cquantile,quantile,fit_mle,mean,median,var,skewness,mode,kurtosis,logccdf,logpdf,logcdf,entropy,@distr_support
   import Base:minimum,maximum
 
   export con_powerlaw,dis_powerlaw,Kolmogorov_smirnov_test,estimate_xmin,bootstrap,bootstrap_p

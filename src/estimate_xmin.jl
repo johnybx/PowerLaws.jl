@@ -26,22 +26,21 @@ function init_xmins(data::AbstractArray,xmins::AbstractArray,xmax::Int64)
   return sorted_data,bins_data,xmins
 end
 
-function estimate_xmin(data::AbstractArray,distribution::Type{con_powerlaw};xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5))
-  min_dist = Inf
-  best_fit = Union{}
-
-  sorted_data,bins_data,xmins = init_xmins(data,xmins,xmax)
-
+function _estimate_xmin(sorted_data::AbstractArray,bins_data::Dict{Float64,Int64},distribution::DataType,xmins::AbstractArray,xmax::Int64)
   if (length(xmins) == 0)
     println("No xmins")
     return Union{}
   end
 
+  min_dist = Inf
+  best_fit = Union{}
+
   for xmin in xmins
     fit_data = sorted_data[bins_data[xmin]:end]
-    f = fit(con_powerlaw,fit_data)
-    #=negloglike(alpha) = begin
-      d = con_powerlaw(alpha[1],f.θ)
+    f = fit(distribution,fit_data)
+    
+    negloglike(alpha) = begin
+      d = distribution(alpha[1],f.θ)
       r = -sum(logpdf(d,fit_data))
       if(Inf == r || -Inf == r)
         r = 1e12
@@ -50,14 +49,14 @@ function estimate_xmin(data::AbstractArray,distribution::Type{con_powerlaw};xmin
     end
     try
       opt_alfa = fminbox(DifferentiableFunction(negloglike),[f.α],[1.0],[Inf])
-      f = con_powerlaw(opt_alfa.minimum[1],f.θ)
+      f = distribution(opt_alfa.minimum[1],f.θ)
     catch
       #if fminbox throws error it means that function cannot be optimized
-    end=#
+    end
     if (f.α == Inf)
       continue
     end
-    d = Kolmogorov_smirnov_test(fit_data,f,xmax)
+    d = Kolmogorov_smirnov_test(fit_data,f,xmin,xmax)
 
     if ((min_dist > d))
       best_fit = f
@@ -67,9 +66,14 @@ function estimate_xmin(data::AbstractArray,distribution::Type{con_powerlaw};xmin
   return best_fit,min_dist
 end
 
+function estimate_xmin(data::AbstractArray,distribution::Type{con_powerlaw};xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5))
+
+  sorted_data,bins_data,xmins = init_xmins(data,xmins,xmax)
+
+  _estimate_xmin(sorted_data,bins_data,distribution,xmins,xmax)
+end
+
 function estimate_xmin(data::AbstractArray,distribution::Type{dis_powerlaw};xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5))
-  min_dist = Inf
-  best_fit = Union{}
   if (data != floor(data))
     println("Data should be discreate. Use round or floor function.")
     return Union{}
@@ -80,6 +84,22 @@ function estimate_xmin(data::AbstractArray,distribution::Type{dis_powerlaw};xmin
     xmins = xmins[findfirst(x -> x >= 1), end]
   end
 
+  _estimate_xmin(sorted_data,bins_data,distribution,xmins,xmax)
+end
+
+function estimate_xmin(data::AbstractArray,distribution::DataType;xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5))
+  min_dist = Inf
+  best_fit = Union{}
+  if ((distribution <: DiscreteUnivariateDistribution)&&(data != floor(data)))
+    println("Data should be discreate. Use round or floor function.")
+    return Union{}
+  end
+
+  sorted_data,bins_data,xmins = init_xmins(data,xmins,xmax)
+  if ((distribution <: DiscreteUnivariateDistribution)&&(xmins[1] < 1))
+    xmins = xmins[findfirst(x -> x >= 1), end]
+  end
+
   if (length(xmins) == 0)
     println("No xmins")
     return Union{}
@@ -87,26 +107,8 @@ function estimate_xmin(data::AbstractArray,distribution::Type{dis_powerlaw};xmin
 
   for xmin in xmins
     fit_data = sorted_data[bins_data[xmin]:end]
-    f = fit(dis_powerlaw,fit_data)
-    
-    negloglike(alpha) = begin
-      d = dis_powerlaw(alpha[1],f.θ)
-      r = -sum(logpdf(d,fit_data))
-      if(Inf == r || -Inf == r)
-        r = 1e12
-      end
-      return r
-    end
-    try
-      opt_alfa = fminbox(DifferentiableFunction(negloglike),[f.α],[1.0],[Inf])
-      f = dis_powerlaw(opt_alfa.minimum[1],f.θ)
-    catch
-      #if fminbox throws error it means that function cannot be optimized
-    end
-    if (f.α == Inf)
-      continue
-    end
-    d = Kolmogorov_smirnov_test(fit_data,f,xmax)
+    f = fit(distribution,fit_data)
+    d = Kolmogorov_smirnov_test(fit_data,f,xmin,xmax)
 
     if ((min_dist > d))
       best_fit = f

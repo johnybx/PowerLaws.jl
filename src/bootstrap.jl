@@ -1,6 +1,4 @@
 function bootstrap(data::AbstractArray,d::UnivariateDistribution;no_of_sims::Int64 = 10,xmins::AbstractArray = [],xmax::Int64 = round(Int,1e5),seed::Int64 = 0)
-  α,θ = params(d)
-
   n = length(data)
 
   seed == 0 ? srand() : srand(seed)

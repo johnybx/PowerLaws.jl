@@ -1,5 +1,4 @@
-# this are macros from Distributions.jl package which are not exported but are useful
-# I am using them because I did not make pull request to add continuous and discrete powerlaw.
+# this is macro from Distributions.jl package which are not exported but are useful for this project
 #=
 The Distributions module is licensed under the MIT License:
 
@@ -20,17 +19,4 @@ macro check_args(D, cond)
                 $(string(D)), ": the condition ", $(string(cond)), " is not satisfied.")))
         end
     end
-end
-
-macro distr_support(D, lb, ub)
-    D_has_constantbounds = (isa(ub, Number) || ub == :Inf) &&
-                           (isa(lb, Number) || lb == :(-Inf))
-
-    @compat paramdecl = D_has_constantbounds ? :(d::Union{$D, Type{$D}}) : :(d::$D)
-
-    # overall
-    esc(quote
-        minimum($(paramdecl)) = $lb
-        maximum($(paramdecl)) = $ub
-    end)
 end
