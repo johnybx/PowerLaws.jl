@@ -66,7 +66,7 @@ function logpdf(d::con_powerlaw, x::AbstractArray)
     l_const = log(α-1.0) - log(θ)
     lpdfs = Array(Float64,0)
     for num in x
-        push!(lpdfs,(num >= θ ? l_const - α * log(x/θ) : -Inf))
+        push!(lpdfs,(num >= θ ? l_const - α * log(num/θ) : -Inf))
     end
     return lpdfs
 end
