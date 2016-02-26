@@ -10,7 +10,7 @@ function init_xmins(data::AbstractArray,xmins::AbstractArray,xmax::Int64)
     xmins = xmins[1:end]
     if xmins[1] <= 0
       println("removing elements smaller than 0")
-      xmins = xmins[findfirst(x -> x > 0), end]
+      xmins = xmins[findfirst(x -> x > 0,xmins), end]
     end
   else
     real_xmins = Array(Bool,length(xmins))

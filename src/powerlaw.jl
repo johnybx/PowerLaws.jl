@@ -4,9 +4,9 @@ module powerlaw
   using Optim
   using Compat
   import Distributions:rand,shape,pdf,ccdf,scale,params,cdf,cquantile,quantile,fit_mle,mean,median,var,skewness,mode,kurtosis,logccdf,logpdf,logcdf,entropy,@distr_support
-  import Base:minimum,maximum
+  import Base:minimum,maximum,show
 
-  export con_powerlaw,dis_powerlaw,Kolmogorov_smirnov_test,estimate_xmin,bootstrap,bootstrap_p
+  export con_powerlaw,dis_powerlaw,Kolmogorov_smirnov_test,estimate_xmin,bootstrap,bootstrap_p,compare_distributions
 
   include("helper_macro.jl")
   include("powerlaw_discrete.jl")
@@ -14,6 +14,7 @@ module powerlaw
   include("estimate_xmin.jl")
   include("Kolmogorov-smirnov_test.jl")
   include("bootstrap.jl")
+  include("compare_distributions.jl")
 
 end
 
