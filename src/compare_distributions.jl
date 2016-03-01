@@ -60,6 +60,7 @@ function compare_distributions(d1::DataType, d2::DataType, data::AbstractArray, 
     end
 
     if (xmin == 0)
+        if (d1 <: DiscreteUnivariateDistribution) xmin = 1 end
         xmin = minimum(data)
     else
         data = sort(data)
@@ -71,7 +72,7 @@ function compare_distributions(d1::DataType, d2::DataType, data::AbstractArray, 
     _compare_distributions(d1,d2,data,xmin,sig_level)
 end
 
-function compare_distributions(d1::DiscreteUnivariateDistribution, d2::DiscreteUnivariateDistribution, data::AbstractArray, xmin::Number = 0; sig_level = 0.05)
+function compare_distributions(d1::DiscreteUnivariateDistribution, d2::DiscreteUnivariateDistribution, data::AbstractArray, xmin::Number = 1; sig_level = 0.05)
    _compare_distributions(d1,d2,data,xmin,sig_level) 
 end
 
