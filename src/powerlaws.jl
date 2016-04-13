@@ -1,4 +1,4 @@
-module powerlaw
+module powerlaws
   using StatsBase
   using Distributions
   using Optim
@@ -21,7 +21,7 @@ end
 
 
 using Distributions
-import powerlaw:bootstrap,bootstrap_p,con_powerlaw,dis_powerlaw
+import powerlaws:bootstrap,bootstrap_p,con_powerlaw,dis_powerlaw
 
 #this parallel versions of bootstrap,bootstrap_p cannot be defined in module powerlaw at this time because
 #of this issue #https://github.com/JuliaLang/julia/issues/13649
