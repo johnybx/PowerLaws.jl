@@ -1,6 +1,8 @@
 PowerLaws.jl
 ======
 
+[![Build Status](https://travis-ci.org/johnybx/PowerLaws.jl.svg?branch=master)](https://travis-ci.org/johnybx/PowerLaws.jl)
+
 This package is under development according to [POWER-LAW DISTRIBUTIONS IN EMPIRICAL DATA](http://arxiv.org/pdf/0706.1062v2.pdf)
 
 Right now there are only few functions which are documented in Doc folder.
