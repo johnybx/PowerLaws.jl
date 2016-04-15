@@ -1,4 +1,4 @@
-powerlaw.jl
+PowerLaws.jl
 ======
 
 This package is under development according to [POWER-LAW DISTRIBUTIONS IN EMPIRICAL DATA](http://arxiv.org/pdf/0706.1062v2.pdf)

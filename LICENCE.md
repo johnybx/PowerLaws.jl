@@ -1,4 +1,4 @@
-###powerlaw is licensed under the MIT License:
+###PowerLaws is licensed under the MIT License:
 
     Copyright (c) 2015: Ján Brechtl
 
