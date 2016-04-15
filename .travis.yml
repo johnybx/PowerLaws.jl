@@ -3,7 +3,3 @@ language: julia
 julia:
   - release
   - 0.4
-
-script: 
-    - julia -e 'Pkg.init(); Pkg.clone("https://github.com/johnybx/PowerLaws.jl.git")' 
-    - julia -e 'Pkg.test("PowerLaws")' 
