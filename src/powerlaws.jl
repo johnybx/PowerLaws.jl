@@ -1,4 +1,4 @@
-module powerlaws
+module PowerLaws
   using StatsBase
   using Distributions
   using Optim
@@ -21,7 +21,7 @@ end
 
 
 using Distributions
-import powerlaws:bootstrap,bootstrap_p,con_powerlaw,dis_powerlaw
+import PowerLaws:bootstrap,bootstrap_p,con_powerlaw,dis_powerlaw
 
 #this parallel versions of bootstrap,bootstrap_p cannot be defined in module powerlaw at this time because
 #of this issue #https://github.com/JuliaLang/julia/issues/13649
@@ -37,7 +37,7 @@ function bootstrap(data::AbstractArray,d::UnivariateDistribution, processes::Int
   put!(rmref,(d,n,xmins,xmax,data))
   helper_arr = Array(Int8,no_of_sims)
   fill!(helper_arr,0)
-  @everywhere using powerlaw
+  @everywhere using PowerLaws
   @everywhere using Distributions
   helper_dict = Dict{Int64,RemoteRef}()
   for prc in workers() # copy data to all processes
@@ -84,7 +84,7 @@ function bootstrap_p(data::AbstractArray,d::UnivariateDistribution, processes::I
   put!(rmref,(d,n,tail_p,tail_indx,xmins,xmax,sort_data))
   helper_arr = Array(Int8,no_of_sims)
   fill!(helper_arr,0)
-  @everywhere using powerlaw
+  @everywhere using PowerLaws
   @everywhere using Distributions
 
   helper_dict = Dict{Int64,RemoteRef}()

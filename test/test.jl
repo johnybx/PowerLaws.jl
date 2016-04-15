@@ -1,4 +1,4 @@
-using powerlaw
+using PowerLaws
 using Base.Test
 
 # tests are based moby dick word distribution
@@ -7,10 +7,10 @@ using Base.Test
 # test are done with tolerance to 1e-9
 tolerance = 1e-9
 
-moby_data = vec(readdlm(string(Pkg.dir("powerlaw"),"/data/moby_dick.txt"),' ',Int))
-cities = vec(readdlm(string(Pkg.dir("powerlaw"),"/data/cities.txt"),' ',Int))
-electrical_blackout = vec(readdlm(string(Pkg.dir("powerlaw"),"/data/electrical_blackouts_US.txt"),' ',Int))
-population = vec(readdlm(string(Pkg.dir("powerlaw"),"/data/population.txt"),' ','\n'))
+moby_data = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/moby_dick.txt"),' ',Int))
+cities = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/cities.txt"),' ',Int))
+electrical_blackout = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/electrical_blackouts_US.txt"),' ',Int))
+population = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/population.txt"),' ','\n'))
 
 println("test: discrete powerlaw")
 est = estimate_xmin(moby_data, dis_powerlaw)
