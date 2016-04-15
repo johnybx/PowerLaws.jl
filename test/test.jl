@@ -4,8 +4,8 @@ using Base.Test
 # tests are based moby dick word distribution
 # and other data sets from http://tuvalu.santafe.edu/~aaronc/powerlaws/data.htm
 # results are compared to result from R poweRlaw package
-# test are done with tolerance to 1e-9
-tolerance = 1e-9
+# test are done with tolerance to 1e-8
+tolerance = 1e-8
 
 moby_data = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/moby_dick.txt"),' ',Int))
 cities = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/cities.txt"),' ',Int))
