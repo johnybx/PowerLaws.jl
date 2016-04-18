@@ -4,6 +4,5 @@ julia:
   - release
   - 0.4
 
-script: 
-    - julia -e 'Pkg.init(); Pkg.clone("https://github.com/johnybx/PowerLaws.jl.git")' 
-    - julia -e 'Pkg.test("PowerLaws")' 
+script:
+    - julia -e 'versioninfo(); Pkg.init(); Pkg.clone(pwd()); Pkg.build("PowerLaws");Pkg.test("PowerLaws");'
