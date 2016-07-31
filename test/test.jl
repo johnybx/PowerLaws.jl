@@ -7,10 +7,10 @@ using Base.Test
 # test are done with tolerance to 1e-8
 tolerance = 1e-8
 
-moby_data = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/moby_dick.txt"),' ',Int))
-cities = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/cities.txt"),' ',Int))
-electrical_blackout = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/electrical_blackouts_US.txt"),' ',Int))
-population = vec(readdlm(string(Pkg.dir("PowerLaws"),"/data/population.txt"),' ','\n'))
+moby_data = vec(readdlm(joinpath(dirname(@__FILE__),"..","data","moby_dick.txt"),' ',Int))
+cities = vec(readdlm(joinpath(dirname(@__FILE__),"..","data","cities.txt"),' ',Int))
+electrical_blackout = vec(readdlm(joinpath(dirname(@__FILE__),"..","data","electrical_blackouts_US.txt"),' ',Int))
+population = vec(readdlm(joinpath(dirname(@__FILE__),"..","data","population.txt"),' ','\n'))
 
 println("test: discrete powerlaw")
 est = estimate_xmin(moby_data, dis_powerlaw)
