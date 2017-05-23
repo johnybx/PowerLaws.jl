@@ -1,8 +1,9 @@
 language: julia
 
 julia:
-  - release
   - 0.4
+  - 0.5
+  - nightly
 
-script:
-    - julia -e 'versioninfo(); Pkg.init(); Pkg.clone(pwd()); Pkg.build("PowerLaws");Pkg.test("PowerLaws");'
+#script: # use the default script which is equivalent to the following
+#    - julia -e 'versioninfo(); Pkg.init(); Pkg.clone(pwd()); Pkg.build("PowerLaws");Pkg.test("PowerLaws");'
